@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <link th:replace="~{fragments :: bootstrap}" />
+    <title>Game Index</title>
+</head>
+
+<body>
+    <link th:replace="~{fragments :: navbar}" />
+    <div class="container">
+
+        <div class="d-flex justify-content-around my-3">
+
+            <p class="h2">Your Game Collection</p>
+            <a th:href="@{/games/create}" class="btn btn-success p-2" type="button"
+                sec:authorize="hasAuthority('ADMIN')">Add a game</a>
+        </div>
+        <form th:action="@{/games}" method="get">
+            <div class="input-group mb-3">
+                <input type="text" name="search" class="form-control" th:value="${param.search}">
+                <button type="submit" class="btn btn-light border-black border">Search</button>
+            </div>
+        </form>
+    </div>
+    <div th:if="${games.size() > 0}">
+        <div class="container">
+
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Publisher</th>
+                        <th scope="col">Platforms</th>
+                        <th scope="col">Genres</th>
+                        <th scope="col" sec:authorize="hasAuthority('ADMIN')">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="game : ${games}" th:object="${game}">
+                        <td>
+                            <a th:href="@{/games/{id}(id=*{id})}" class="text-black">
+                                [[*{name}]]
+                            </a>
+                        </td>
+                        <td>[[*{description}]]</td>
+                        <td>[[*{publisher}]]</td>
+                        <td>
+                            <span th:each="platform : ${game.getPlatforms()}"
+                                class="mt-1 fw-bold border text-black border-black badge">[[${platform.getName()}]]</span>
+                        </td>
+                        <td>
+                            <div class="d-flex">
+                                <div th:each="genre : ${game.getGenres()}">
+                                    <p class="badge text-black border border-black m-2">[[${genre.getName()}]]</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex me-3 gap-2 " sec:authorize="hasAuthority('ADMIN')">
+                                <a type="button" class="btn btn-primary btn-sm"
+                                    th:href="@{/games/edit/{id}(id=*{id})}">Edit</a>
+
+                                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                    th:data-bs-target="'#delete-modal-' + *{id}">
+                                    Remove
+                                </button>
+
+
+
+                                <div class="modal fade" th:id="'delete-modal-' + *{id}" tabindex="-1"
+                                    aria-labelledby="delete-modal" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="deleteModalLabel">Remove "[[${game.name}]]"
+                                                </h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Are you sure you want to remove this game from your collection?</p>
+                                            </div>
+                                            <div class="modal-footer d-flex justify-content-around">
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-bs-dismiss="modal">Close</button>
+
+                                                <form th:action="@{/games/delete/{id}(id=${game.id})}" method="post">
+                                                    <button class="btn btn-danger" type="submit">Delete</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div th:unless="${games.size() > 0}">
+        <h3 class="text-center">No games available.</h3>
+    </div>
+
+    <script th:replace="~{fragments :: scripts}"></script>
+</body>
+
+</html>

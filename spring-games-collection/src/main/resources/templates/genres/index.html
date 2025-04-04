@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <link th:replace="~{fragments :: bootstrap}" />
+    <title>Genres Index</title>
+</head>
+
+<body>
+    <link th:replace="~{fragments :: navbar}" />
+    <div class="container">
+        <div class="d-flex justify-content-around m-3">
+
+            <p class="h2">Game Genres</p>
+            <a th:href="@{/genres/create}" class="btn btn-success p-2" type="button"
+                sec:authorize="hasAuthority('ADMIN')">Add a genre</a>
+        </div>
+        <form th:action="@{/genres}" method="get">
+            <div class="input-group mb-3">
+                <input type="text" name="search" class="form-control" th:value="${param.search}">
+                <button type="submit" class="btn btn-light border-black border">Search</button>
+            </div>
+        </form>
+    </div>
+    <div th:if="${genres.size() > 0}">
+        <div class="container">
+
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Target Audience</th>
+                        <th scope="col">Linked games</th>
+                        <th scope="col" sec:authorize="hasAuthority('ADMIN')">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="genre : ${genres}" th:object="${genre}">
+                        <td>
+                            <h6 class="text-black">
+                                [[*{name}]]
+                            </h6>
+                        </td>
+                        <td>[[*{description}]]</td>
+                        <td>[[*{targetAudience}]]</td>
+                        <td>
+                            <span class="me-2 fw-bold text-decoration-underline">[[${genre.getGames().size}]]</span>
+                        </td>
+                        <td>
+                            <div class="d-flex me-3 gap-2" sec:authorize="hasAuthority('ADMIN')">
+                                <a type="button" class="btn btn-primary btn-sm"
+                                    th:href="@{/genres/edit/{id}(id=*{id})}">Edit</a>
+
+                                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                    th:data-bs-target="'#delete-modal-' + *{id}">
+                                    Remove
+                                </button>
+
+
+
+                                <div class="modal fade" th:id="'delete-modal-' + *{id}" tabindex="-1"
+                                    aria-labelledby="delete-modal" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="deleteModalLabel">Remove "[[${genre.name}]]"
+                                                </h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Are you sure you want to remove this genre from your game collection?
+                                                </p>
+                                            </div>
+                                            <div class="modal-footer d-flex justify-content-around">
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-bs-dismiss="modal">Close</button>
+
+                                                <form th:action="@{/genres/delete/{id}(id=${genre.id})}" method="post">
+                                                    <button class="btn btn-danger" type="submit">Delete</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div th:unless="${genres.size() > 0}">
+        <h3 class="text-center">No Genres available.</h3>
+    </div>
+
+    <script th:replace="~{fragments :: scripts}"></script>
+</body>
+
+</html>

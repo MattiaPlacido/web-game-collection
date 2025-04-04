@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <link th:replace="~{ fragments :: bootstrap}">
+    <title>Game Create</title>
+</head>
+
+<body>
+    <link th:replace="~{fragments :: navbar}" />
+    <div class="container mt-3 p-2">
+
+
+        <h1 class="text-center"><span th:if="${edit}">Update [[${game.name}]]</span><span th:unless="${edit}">Insert a
+                new
+                game</span></h1>
+
+
+        <form id="new-game-form" th:action="${edit} ? @{/games/edit/{id}(id = ${game.id})} : @{/games/create}"
+            method="post" th:object="${game}">
+            <div class="mb-3">
+                <label class="form-label" for="name">Name : </label>
+                <input class="form-control" type="text" id="name" th:field="*{name}" th:errorClass="is-invalid">
+                <div th:if="${#fields.hasErrors('name')}" class="invalid-feedback">
+                    <ul>
+                        <li th:each="err : ${#fields.errors('name')}" th:text="${err}"></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="description">Description : </label>
+                <textarea class="form-control" id="description" th:field="*{description}"
+                    th:errorClass="is-invalid"></textarea>
+                <div th:if="${#fields.hasErrors('description')}" class="invalid-feedback">
+                    <ul>
+                        <li th:each="err : ${#fields.errors('description')}" th:text="${err}"></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="imageUrl">Image Url : </label>
+                <input class="form-control" type="text" id="imageUrl" th:field="*{imageUrl}" th:errorClass="is-invalid">
+                <div th:if="${#fields.hasErrors('imageUrl')}" class="invalid-feedback">
+                    <ul>
+                        <li th:each="err : ${#fields.errors('imageUrl')}" th:text="${err}"></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="publisher">Publisher : </label>
+                <input class="form-control" type="text" id="publisher" th:field="*{publisher}"
+                    th:errorClass="is-invalid">
+                <div th:if="${#fields.hasErrors('publisher')}" class="invalid-feedback">
+                    <ul>
+                        <li th:each="err : ${#fields.errors('publisher')}" th:text="${err}"></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="releaseDate">Release Date : </label>
+                <input class="form-control" type="date" id="releaseDate" th:field="*{releaseDate}"
+                    th:errorClass="is-invalid">
+                <div th:if="${#fields.hasErrors('releaseDate')}" class="invalid-feedback">
+                    <ul>
+                        <li th:each="err : ${#fields.errors('releaseDate')}" th:text="${err}"></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mb-3 d-flex justify-content-around">
+                <div>
+                    <p>Genres : </p>
+                    <div class="form-check" th:each="genre : ${genres}">
+                        <input type="checkbox" th:id="|genre-${genre.id}|" th:field="${game.genres}"
+                            th:value="${genre.id}">
+                        <label class=" form-label" for="|genre-${genre.id}|">[[${genre.name}]]</label>
+                    </div>
+                </div>
+                <div>
+                    <p>Platforms : </p>
+                    <div class="form-check" th:each="platform : ${platforms}">
+                        <input type="checkbox" th:id="|platform-${platform.id}|" th:field="${game.platforms}"
+                            th:value="${platform.id}">
+                        <label class=" form-label" for="|platform-${platform.id}|">[[${platform.name}]]</label>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-3 d-flex justify-content-between">
+                <input type="submit" class="btn btn-dark" value="Submit Game">
+                <input type="reset" class="btn btn-danger" value="Reset fields">
+            </div>
+        </form>
+    </div>
+</body>
+<link th:replace="~{ fragments :: scripts}">
+
+</html>

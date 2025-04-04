@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <link th:replace="~{fragments :: bootstrap}" />
+    <title>Platform Index</title>
+</head>
+
+<body>
+    <link th:replace="~{fragments :: navbar}" />
+    <div class="container">
+        <div class="d-flex justify-content-around m-3">
+
+            <p class="h2">Gaming Platforms</p>
+            <a th:href="@{/platforms/create}" class="btn btn-success p-2" type="button"
+                sec:authorize="hasAuthority('ADMIN')">Add a gaming platform</a>
+        </div>
+        <form th:action="@{/platforms}" method="get">
+            <div class="input-group mb-3">
+                <input type="text" name="search" class="form-control" th:value="${param.search}">
+                <button type="submit" class="btn btn-light border-black border">Search</button>
+            </div>
+        </form>
+    </div>
+    <div th:if="${platforms.size() > 0}">
+        <div class="container">
+
+
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Publishing Company</th>
+                        <th scope="col">Playable games</th>
+                        <th scope="col" sec:authorize="hasAuthority('ADMIN')">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="platform : ${platforms}" th:object="${platform}">
+                        <td>
+                            <h6 class="text-black">
+                                [[*{name}]]
+                            </h6>
+                        </td>
+                        <td>[[*{description}]]</td>
+                        <td>[[*{publishingCompany}]]</td>
+                        <td>
+                            <span class="me-2 fw-bold text-decoration-underline">[[${platform.getGames().size}]]</span>
+                        </td>
+                        <td>
+                            <div class="d-flex me-3 gap-2" sec:authorize="hasAuthority('ADMIN')">
+                                <a type="button" class="btn btn-primary btn-sm"
+                                    th:href="@{/platforms/edit/{id}(id=*{id})}">Edit</a>
+
+                                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                    th:data-bs-target="'#delete-modal-' + *{id}">
+                                    Remove
+                                </button>
+
+
+
+                                <div class="modal fade" th:id="'delete-modal-' + *{id}" tabindex="-1"
+                                    aria-labelledby="delete-modal" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="deleteModalLabel">Remove
+                                                    "[[${platform.name}]]"
+                                                </h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Are you sure you want to remove this gaming platform?
+                                                </p>
+                                            </div>
+                                            <div class="modal-footer d-flex justify-content-around">
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-bs-dismiss="modal">Close</button>
+
+                                                <form th:action="@{/platforms/delete/{id}(id=${platform.id})}"
+                                                    method="post">
+                                                    <button class="btn btn-danger" type="submit">Delete</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div th:unless="${platforms.size() > 0}">
+        <p>No platforms available.</p>
+    </div>
+
+    <script th:replace="~{fragments :: scripts}"></script>
+</body>
+
+</html>
